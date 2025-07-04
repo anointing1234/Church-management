@@ -1,0 +1,290 @@
+{% load static %}
+<header class="main-header">
+  <div class="d-flex align-items-center logo-box justify-content-start">
+    <!-- Logo -->
+    <a href="index.html" class="logo">
+      <!-- logo-->
+      <div class="logo-mini w-30">
+        <span class="light-logo"><img src="{% static 'images/logo-letter.png' %}" alt="logo"></span>
+        <span class="dark-logo"><img src="{% static 'images/logo-letter-white.png' %}" alt="logo"></span>
+      </div>
+      <div class="logo-lg">
+        <span class="light-logo"><img src="{% static 'images/logo-dark-text.png' %}" alt="logo"></span>
+        <span class="dark-logo"><img src="{% static 'images/logo-light-text.png' %}" alt="logo"></span>
+      </div>
+    </a>
+  </div>
+  <!-- Header Navbar -->
+  <nav class="navbar navbar-static-top">
+    <!-- Sidebar toggle button-->
+    <div class="app-menu">
+      <ul class="header-megamenu nav">
+        <li class="btn-group nav-item">
+          <a href="#" class="waves-effect waves-light nav-link push-btn btn-primary-light ms-0" data-toggle="push-menu"
+            role="button">
+            <i data-feather="menu"></i>
+          </a>
+        </li>
+        <li class="btn-group d-lg-inline-flex d-none">
+          <div class="app-menu">
+            <div class="search-bx mx-5">
+              <form>
+                <div class="input-group">
+                  <input type="search" class="form-control" placeholder="Search">
+                  <div class="input-group-append">
+                    <button class="btn" type="submit" id="button-addon3"><i class="icon-Search"><span
+                          class="path1"></span><span class="path2"></span></i></button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="navbar-custom-menu r-side">
+      <ul class="nav navbar-nav">
+        <li class="btn-group d-md-inline-flex d-none">
+          <a href="javascript:void(0)" title="skin Change" class="waves-effect skin-toggle waves-light">
+            <label class="switch">
+              <input type="checkbox" data-mainsidebarskin="toggle" id="toggle_left_sidebar_skin">
+              <span class="switch-on"><i data-feather="moon"></i></span>
+              <span class="switch-off"><i data-feather="sun"></i></span>
+            </label>
+          </a>
+        </li>
+
+       
+
+       
+        <li class="btn-group nav-item d-xl-inline-flex d-none">
+          <a href="#" data-provide="fullscreen" class="waves-effect waves-light nav-link btn-primary-light svg-bt-icon" title="Full Screen">
+            <i data-feather="maximize"></i>
+          </a>
+        </li>
+
+        <!-- User Account-->
+        <li class="dropdown user user-menu">
+          <a href="#" class="waves-effect waves-light dropdown-toggle w-auto l-h-12 bg-transparent p-0 no-shadow" title="User"
+            data-bs-toggle="modal" data-bs-target="#quick_user_toggle">
+            <div class="d-flex pt-1 align-items-center">
+              <div class="text-end me-10">
+                <p class="pt-5 fs-14 mb-0 fw-700">Welcome   {{ request.user.username }}</p>
+              </div>
+              <img src="{{ user.profile_picture.url }}" class="avatar rounded-circle bg-primary-light h-40 w-40" alt="" />
+            </div>
+          </a>
+        </li>
+  
+
+      </ul>
+    </div>
+  </nav>
+</header>
+
+
+<aside class="main-sidebar">
+  <section class="sidebar position-relative">
+    <div class="multinav">
+      <div class="multinav-scroll" style="height: 97%;">
+        <ul class="sidebar-menu" data-widget="tree">
+
+          <li>
+            <a href="{% url 'home' %}">
+              <i data-feather="home"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+
+          {% if user.is_superuser or user_role in ministry_roles %}
+          <li class="treeview">
+            <a href="#">
+              <i data-feather="users"></i>
+              <span>Ministry</span>
+              <span class="pull-right-container"><i class="fa fa-angle-right pull-right"></i></span>
+            </a>
+            <ul class="treeview-menu">
+              {% if user.is_superuser or user_role == 'ministry_church_1' %}
+              <li><a href="{% url 'ministry' 'church1' %}"><i class="far fa-circle"></i> Ministry church 1</a></li>
+              {% endif %}
+              {% if user.is_superuser or user_role == 'ministry_church_2' %}
+              <li><a href="{% url 'ministry' 'church2' %}"><i class="far fa-circle"></i> Ministry church 2</a></li>
+              {% endif %}
+            </ul>
+          </li>
+          {% endif %}
+
+          {% if user.is_superuser or user_role in membership_roles %}
+          <li class="treeview">
+            <a href="#">
+              <i data-feather="user-check"></i>
+              <span>Membership</span>
+              <span class="pull-right-container"><i class="fa fa-angle-right pull-right"></i></span>
+            </a>
+            <ul class="treeview-menu">
+              {% if user.is_superuser or user_role == 'membership_church_1' %}
+              <li><a href="{% url 'membership' 'church1' %}"><i class="far fa-circle"></i> Membership church 1</a></li>
+              {% endif %}
+              {% if user.is_superuser or user_role == 'membership_church_2' %}
+              <li><a href="{% url 'membership' 'church2' %}"><i class="far fa-circle"></i> Membership church 2</a></li>
+              {% endif %}
+            </ul>
+          </li>
+          {% endif %}
+
+          {% if user.is_superuser or user_role in junior_church_roles %}
+          <li class="treeview">
+            <a href="#">
+              <i data-feather="users"></i>
+              <span>Junior church</span>
+              <span class="pull-right-container"><i class="fa fa-angle-right pull-right"></i></span>
+            </a>
+            <ul class="treeview-menu">
+              {% if user.is_superuser or user_role == 'junior_church_1' %}
+              <li><a href="{% url 'junior_church' 'church1' %}"><i class="far fa-circle"></i> Junior church 1</a></li>
+              {% endif %}
+              {% if user.is_superuser or user_role == 'junior_church_2' %}
+              <li><a href="{% url 'junior_church' 'church2' %}"><i class="far fa-circle"></i> Junior church 2</a></li>
+              {% endif %}
+            </ul>
+          </li>
+          {% endif %}
+
+          {% if user.is_superuser or user_role in multimedia_roles %}
+          <li class="treeview">
+            <a href="#">
+              <i data-feather="tv"></i>
+              <span>Multimedia</span>
+              <span class="pull-right-container"><i class="fa fa-angle-right pull-right"></i></span>
+            </a>
+            <ul class="treeview-menu">
+              {% if user.is_superuser or user_role == 'multimedia_church_1' %}
+              <li><a href="{% url 'birthday_adverts' 'church1' %}"><i class="far fa-circle"></i> Church 1</a></li>
+              {% endif %}
+              {% if user.is_superuser or user_role == 'multimedia_church_2' %}
+              <li><a href="{% url 'birthday_adverts' 'church2' %}"><i class="far fa-circle"></i> Church 2</a></li>
+              {% endif %}
+            </ul>
+          </li>
+          {% endif %}
+
+          {% if user.is_superuser or user_role == 'social_media_report' %}
+          <li class="treeview">
+            <a href="#">
+              <i data-feather="bar-chart-2"></i>
+              <span>Social Media Report</span>
+              <span class="pull-right-container"><i class="fa fa-angle-right pull-right"></i></span>
+            </a>
+            <ul class="treeview-menu">
+              <li><a href="{% url 'social-media' 'church1' %}"><i class="far fa-circle"></i> Church 1</a></li>
+              <li><a href="{% url 'social-media' 'church2' %}"><i class="far fa-circle"></i> Church 2</a></li>
+            </ul>
+          </li>
+          {% endif %}
+
+          {% if user.is_superuser or user_role == 'missions_team_summary' %}
+          <li>
+            <a href="{% url 'missions_summary' %}">
+              <i data-feather="briefcase"></i> <span>Missions Team Summary</span>
+            </a>
+          </li>
+          {% endif %}
+
+          {% if user.is_superuser or user_role == 'sakponba_church' %}
+          <li>
+            <a href="{% url 'sakponba_church' %}">
+              <i data-feather="home"></i> <span>Sakponba Church</span>
+            </a>
+          </li>
+          {% endif %}
+
+          {% if user.is_superuser or user_role == 'uselu_church' %}
+          <li>
+            <a href="{% url 'uselu_church' %}">
+              <i data-feather="home"></i> <span>Uselu Church</span>
+            </a>
+          </li>
+          {% endif %}
+
+          {% if user.is_superuser or user_role == 'hill_church' %}
+          <li>
+            <a href="{% url 'hill_church' %}">
+              <i data-feather="home"></i> <span>Hill Church</span>
+            </a>
+          </li>
+          {% endif %}
+
+          {% if user.is_authenticated %}
+          <li>
+            <a href="{% url 'logout' %}">
+              <i data-feather="log-out"></i> <span>Logout</span>
+            </a>
+          </li>
+          {% else %}
+          <li>
+            <a href="{% url 'auth_login' %}">
+              <i data-feather="log-in"></i> <span>Login</span>
+            </a>
+          </li>
+          {% endif %}
+
+        </ul>
+      </div>
+    </div>
+  </section>
+</aside>
+
+
+<!-- quick_user_toggle -->
+<div class="modal modal-right fade" id="quick_user_toggle" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content slim-scroll3">
+      <div class="modal-body p-30 bg-white">
+        <div class="d-flex align-items-center justify-content-between pb-30 border-bottom border-light">
+          <h4 class="m-0">Profile</h4>
+          <button type="button" class="btn btn-icon btn-danger-light btn-sm no-shadow" data-bs-dismiss="modal" aria-label="Close">
+            <span class="fa fa-close"></span>
+          </button>
+        </div>
+        <div class="d-flex flex-row align-items-center my-4">
+          <img src="{{ user.profile_picture.url }}" alt="user" class="rounded-circle bg-danger-light" width="100" height="100" />
+          <div class="ps-4">
+           <h5 class="mb-1 fw-bold">{{ request.user.username }}</h5>
+            <p class="text-muted mb-2">
+                {% if request.user.is_superuser or request.user.is_staff %}
+                    Admin
+                {% else %}
+                    User
+                {% endif %}
+            </p>
+           
+          </div>
+        </div>
+        <div class="dropdown-divider my-4"></div>
+        <div>
+          <div class="d-flex align-items-center mb-4">
+            <div class="me-3 bg-primary-light rounded-circle d-flex justify-content-center align-items-center" style="width:50px; height:50px;">
+              <span class="icon-Library fs-24"><span class="path1"></span><span class="path2"></span></span>
+            </div>
+            <div class="d-flex flex-column fw-semibold">
+              <a href="{% url 'profile' %}" class="text-dark hover-primary mb-1 fs-16 text-decoration-none">My Profile</a>
+              <small class="text-muted">Account settings and more</small>
+            </div>
+          </div>
+     
+          <div class="d-flex align-items-center">
+            <div class="me-3 bg-success-light rounded-circle d-flex justify-content-center align-items-center" style="width:50px; height:50px;">
+              <span class="icon-Group-chat fs-24"><span class="path1"></span><span class="path2"></span></span>
+            </div>
+            <div class="d-flex flex-column fw-semibold">
+              <a href="{% url 'auth_login' %}" class="text-dark hover-success mb-1 fs-16 text-decoration-none">Logout</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /quick_user_toggle -->
+

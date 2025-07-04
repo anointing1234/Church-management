@@ -1,0 +1,475 @@
+{% load static %}
+{% load custom_filters %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="{% static 'images/favicon.ico' %}">
+    <title>MIRACLE ASSEMBLY - MANAGEMENT SYSTEM</title>
+
+    <!-- Vendors Style-->
+    <link rel="stylesheet" href="{% static 'src/css/vendors_css.css' %}">
+
+    <!-- Style-->
+    <link rel="stylesheet" href="{% static 'src/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'src/css/skin_color.css' %}">
+    <link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+/>
+
+  </head>
+<body class="hold-transition dark-skin sidebar-mini theme-primary fixed">
+	
+<div class="wrapper">
+	<div id="loader"></div>
+
+  
+  {% load static %}
+<header class="main-header">
+  <div class="d-flex align-items-center logo-box justify-content-start">
+    <!-- Logo -->
+    <a href="index.html" class="logo">
+      <!-- logo-->
+      <div class="logo-mini w-30">
+        <span class="light-logo"><img src="{% static 'images/logo-letter.png' %}" alt="logo"></span>
+        <span class="dark-logo"><img src="{% static 'images/logo-letter-white.png' %}" alt="logo"></span>
+      </div>
+      <div class="logo-lg">
+        <span class="light-logo"><img src="{% static 'images/logo-dark-text.png' %}" alt="logo"></span>
+        <span class="dark-logo"><img src="{% static 'images/logo-light-text.png' %}" alt="logo"></span>
+      </div>
+    </a>
+  </div>
+  <!-- Header Navbar -->
+  <nav class="navbar navbar-static-top">
+    <!-- Sidebar toggle button-->
+    <div class="app-menu">
+      <ul class="header-megamenu nav">
+        <li class="btn-group nav-item">
+          <a href="#" class="waves-effect waves-light nav-link push-btn btn-primary-light ms-0" data-toggle="push-menu"
+            role="button">
+            <i data-feather="menu"></i>
+          </a>
+        </li>
+        <li class="btn-group d-lg-inline-flex d-none">
+          <div class="app-menu">
+            <div class="search-bx mx-5">
+              <form>
+                <div class="input-group">
+                  <input type="search" class="form-control" placeholder="Search">
+                  <div class="input-group-append">
+                    <button class="btn" type="submit" id="button-addon3"><i class="icon-Search"><span
+                          class="path1"></span><span class="path2"></span></i></button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="navbar-custom-menu r-side">
+      <ul class="nav navbar-nav">
+        <li class="btn-group d-md-inline-flex d-none">
+          <a href="javascript:void(0)" title="skin Change" class="waves-effect skin-toggle waves-light">
+            <label class="switch">
+              <input type="checkbox" data-mainsidebarskin="toggle" id="toggle_left_sidebar_skin">
+              <span class="switch-on"><i data-feather="moon"></i></span>
+              <span class="switch-off"><i data-feather="sun"></i></span>
+            </label>
+          </a>
+        </li>
+
+
+
+
+
+
+
+       
+        <li class="btn-group nav-item d-xl-inline-flex d-none">
+          <a href="#" data-provide="fullscreen" class="waves-effect waves-light nav-link btn-primary-light svg-bt-icon" title="Full Screen">
+            <i data-feather="maximize"></i>
+          </a>
+        </li>
+
+        <!-- User Account-->
+        <li class="dropdown user user-menu">
+          <a href="#" class="waves-effect waves-light dropdown-toggle w-auto l-h-12 bg-transparent p-0 no-shadow" title="User"
+            data-bs-toggle="modal" data-bs-target="#quick_user_toggle">
+            <div class="d-flex pt-1 align-items-center">
+              <div class="text-end me-10">
+                <p class="pt-5 fs-14 mb-0 fw-700">{{ request.user.username }}</p>
+              </div>
+              <img src="{{ user.profile_picture.url }}" class="avatar rounded-circle bg-primary-light h-40 w-40" alt="" />
+            </div>
+          </a>
+        </li>
+  
+
+      </ul>
+    </div>
+  </nav>
+</header>
+
+
+<aside class="main-sidebar">
+  <section class="sidebar position-relative">
+    <div class="multinav">
+      <div class="multinav-scroll" style="height: 97%;">
+        <ul class="sidebar-menu" data-widget="tree">
+
+          <li>
+            <a href="{% url 'home' %}">
+              <i data-feather="home"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+
+          {% if user.is_superuser or user_role in ministry_roles %}
+          <li class="treeview">
+            <a href="#">
+              <i data-feather="users"></i>
+              <span>Ministrys</span>
+              <span class="pull-right-container"><i class="fa fa-angle-right pull-right"></i></span>
+            </a>
+            <ul class="treeview-menu">
+              {% if user.is_superuser or user_role == 'ministry_church_1' %}
+              <li><a href="{% url 'ministry' 'church1' %}"><i class="far fa-circle"></i> Ministry church 1</a></li>
+              {% endif %}
+              {% if user.is_superuser or user_role == 'ministry_church_2' %}
+              <li><a href="{% url 'ministry' 'church2' %}"><i class="far fa-circle"></i> Ministry church 2</a></li>
+              {% endif %}
+            </ul>
+          </li>
+          {% endif %}
+
+          {% if user.is_superuser or user_role in membership_roles %}
+          <li class="treeview">
+            <a href="#">
+              <i data-feather="user-check"></i>
+              <span>Memberships</span>
+              <span class="pull-right-container"><i class="fa fa-angle-right pull-right"></i></span>
+            </a>
+            <ul class="treeview-menu">
+              {% if user.is_superuser or user_role == 'membership_church_1' %}
+              <li><a href="{% url 'membership' 'church1' %}"><i class="far fa-circle"></i> Membership church 1</a></li>
+              {% endif %}
+              {% if user.is_superuser or user_role == 'membership_church_2' %}
+              <li><a href="{% url 'membership' 'church2' %}"><i class="far fa-circle"></i> Membership church 2</a></li>
+              {% endif %}
+            </ul>
+          </li>
+          {% endif %}
+
+          {% if user.is_superuser or user_role in junior_church_roles %}
+          <li class="treeview">
+            <a href="#">
+              <i data-feather="users"></i>
+              <span>Junior church</span>
+              <span class="pull-right-container"><i class="fa fa-angle-right pull-right"></i></span>
+            </a>
+            <ul class="treeview-menu">
+              {% if user.is_superuser or user_role == 'junior_church_1' %}
+              <li><a href="{% url 'junior_church' 'church1' %}"><i class="far fa-circle"></i> Junior church 1</a></li>
+              {% endif %}
+              {% if user.is_superuser or user_role == 'junior_church_2' %}
+              <li><a href="{% url 'junior_church' 'church2' %}"><i class="far fa-circle"></i> Junior church 2</a></li>
+              {% endif %}
+            </ul>
+          </li>
+          {% endif %}
+
+          {% if user.is_superuser or user_role in multimedia_roles %}
+          <li class="treeview">
+            <a href="#">
+              <i data-feather="tv"></i>
+              <span>Multimedia</span>
+              <span class="pull-right-container"><i class="fa fa-angle-right pull-right"></i></span>
+            </a>
+            <ul class="treeview-menu">
+              {% if user.is_superuser or user_role == 'multimedia_church_1' %}
+              <li><a href="{% url 'birthday_adverts' 'church1' %}"><i class="far fa-circle"></i> Church 1</a></li>
+              {% endif %}
+              {% if user.is_superuser or user_role == 'multimedia_church_2' %}
+              <li><a href="{% url 'birthday_adverts' 'church2' %}"><i class="far fa-circle"></i> Church 2</a></li>
+              {% endif %}
+            </ul>
+          </li>
+          {% endif %}
+
+          {% if user.is_superuser or user_role == 'social_media_report' %}
+          <li class="treeview">
+            <a href="#">
+              <i data-feather="bar-chart-2"></i>
+              <span>Social Media Report</span>
+              <span class="pull-right-container"><i class="fa fa-angle-right pull-right"></i></span>
+            </a>
+            <ul class="treeview-menu">
+              <li><a href="{% url 'social-media' 'church1' %}"><i class="far fa-circle"></i> Church 1</a></li>
+              <li><a href="{% url 'social-media' 'church2' %}"><i class="far fa-circle"></i> Church 2</a></li>
+            </ul>
+          </li>
+          {% endif %}
+
+          {% if user.is_superuser or user_role == 'missions_team_summary' %}
+          <li>
+            <a href="{% url 'missions_summary' %}">
+              <i data-feather="briefcase"></i> <span>Missions Team Summary</span>
+            </a>
+          </li>
+          {% endif %}
+
+          {% if user.is_superuser or user_role == 'sakponba_church' %}
+          <li>
+            <a href="{% url 'sakponba_church' %}">
+              <i data-feather="home"></i> <span>Sakponba Church</span>
+            </a>
+          </li>
+          {% endif %}
+
+          {% if user.is_superuser or user_role == 'uselu_church' %}
+          <li>
+            <a href="{% url 'uselu_church' %}">
+              <i data-feather="home"></i> <span>Uselu Church</span>
+            </a>
+          </li>
+          {% endif %}
+
+          {% if user.is_superuser or user_role == 'hill_church' %}
+          <li>
+            <a href="{% url 'hill_church' %}">
+              <i data-feather="home"></i> <span>Hill Church</span>
+            </a>
+          </li>
+          {% endif %}
+
+          {% if user.is_authenticated %}
+          <li>
+            <a href="{% url 'logout' %}">
+              <i data-feather="log-out"></i> <span>Logout</span>
+            </a>
+          </li>
+          {% else %}
+          <li>
+            <a href="{% url 'auth_login' %}">
+              <i data-feather="log-in"></i> <span>Login</span>
+            </a>
+          </li>
+          {% endif %}
+
+        </ul>
+      </div>
+    </div>
+  </section>
+</aside>
+
+
+  
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+	  <div class="container-full">
+		<!-- Content Header (Page header) -->	  
+		<div class="content-header mb-5 pb-5">
+			<div class="d-flex align-items-center">
+				<div class="me-auto">
+					<h4 class="page-title">Profile</h4>
+					<div class="d-inline-block align-items-center">
+						<nav>
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item"><a href="#"><i class="mdi mdi-home-outline"></i></a></li>
+								<li class="breadcrumb-item" aria-current="page">Extra</li>
+								<li class="breadcrumb-item active" aria-current="page">Profile</li>
+							</ol>
+						</nav>
+					</div>
+				</div>
+				
+			</div>
+		</div>
+
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" id="autoDismiss">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  {% endfor %}
+{% endif %}
+
+
+
+		<!-- Main content -->
+		<section class="content">
+			<div class="row">
+				  <div class="col-xl-4 col-lg-5">
+            <div class="card text-center">
+                <div class="card-body">
+                    <div class="d-inline-block">
+                        <!-- Profile Image -->
+                        {% if user.profile_picture %}
+                            <img src="{{ user.profile_picture.url }}" class="bg-light w-100 h-100 rounded-circle avatar-lg img-thumbnail" alt="profile-image">
+                        {% else %}
+                            <img src="{% static 'images/avatar/avatar-13.png' %}" class="bg-light w-100 h-100 rounded-circle avatar-lg img-thumbnail" alt="profile-image">
+                        {% endif %}
+
+                        <!-- Upload Button Under Image -->
+                        <form method="post" enctype="multipart/form-data" action="{% url 'update_profile_picture' %}" class="mt-3">
+                            {% csrf_token %}
+                            <label for="profilePicInput" class="btn btn-primary btn-sm">
+                                <i class="mdi mdi-camera"></i> Change Photo
+                            </label>
+                            <input id="profilePicInput" type="file" name="profile_picture" onchange="this.form.submit()" class="d-none">
+                        </form>
+                    </div>
+
+                    <h4 class="mb-0 mt-3">{{ user.username }}</h4>
+                    <p class="text-muted fs-14">{{ user.role|default:"N/A"|replace_underscore }}</p>
+
+                    <div class="text-center mt-5">
+                        <p class="text-muted mb-2"><strong class="text-dark">Full Name :</strong> <span class="ms-2">{{ user.username }}</span></p>
+                        <p class="text-muted mb-2"><strong class="text-dark">Mobile :</strong><span class="ms-2">{{ user.phone_number }}</span></p>
+                        <p class="text-muted mb-2"><strong class="text-dark">Email :</strong> <span class="ms-2">{{ user.email }}</span></p>
+						<p class="text-muted mb-2"><strong class="text-dark">Role:</strong> <span class="ms-2">{{ user.role|default:"N/A"|replace_underscore }}</span></p>
+                    </div>
+                </div> <!-- end card-body -->
+            </div> <!-- end card -->
+        </div> <!-- end col -->
+
+
+				<div class="col-xl-8 col-lg-7">
+					<div class="card">
+						<div class="card-body">
+							<ul class="nav nav-pills bg-nav-pills nav-justified mb-3">
+								
+								<li class="nav-item">
+									<a href="#settings" data-bs-toggle="tab" aria-expanded="false" class="nav-link rounded-0">
+										Settings
+									</a>
+								</li>
+							</ul>
+													<div class="tab-content">
+							<div class="tab-pane show active" id="settings">
+								<form method="post" action="{% url 'update_profile' %}">
+									{% csrf_token %}
+									<h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Personal Info</h5>
+
+									<div class="row">
+										<div class="col-md-12">
+											<div class="mb-3">
+												<label for="firstname" class="form-label">Username</label>
+												<input type="text" class="form-control" id="firstname" name="username" value="{{ user.username }}">
+											</div>
+										</div>
+									</div> <!-- end row -->
+
+									<div class="row">
+										<div class="col-md-6">
+											<div class="mb-3">
+												<label for="useremail" class="form-label">Email Address</label>
+												<input type="email" class="form-control" id="useremail" name="email" value="{{ user.email }}">
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="mb-3">
+												<label for="phone" class="form-label">Phone number</label>
+													<input type="tel" name="phone_number" class="form-control ps-15" value="{{ user.phone_number }}" placeholder="+1234567890" required pattern="^\+[\d\s\-\(\)]+$" title="Phone number must start with + and contain digits only">
+											</div>
+										</div>
+									</div> <!-- end row -->
+
+									<div class="text-end">
+										<button type="submit" class="btn btn-primary mt-2"><i class="mdi mdi-content-save"></i> Save</button>
+									</div>
+								</form>
+							</div>
+
+
+
+
+							</div> <!-- end tab-content -->
+						</div> <!-- end card body -->
+					</div> <!-- end card -->
+				</div> <!-- end col -->
+			</div>
+			<!-- end row-->
+
+		</section>
+		<!-- /.content -->
+
+
+
+
+	  </div>
+  </div>
+  <!-- /.content-wrapper -->
+ 
+   <footer class="main-footer">
+    <div class="pull-right d-none d-sm-inline-block">
+        <ul class="nav nav-primary nav-dotted nav-dot-separated justify-content-center justify-content-md-end">
+
+		</ul>
+    </div>
+	  &copy; <script>document.write(new Date().getFullYear())</script> <a href="https://www.MiracleAssemblyManagement.com/">MiracleAssemblyManagement.com</a>. All Rights Reserved.
+  </footer>
+  <!-- Side panel --> 
+  
+    
+
+
+  
+  <!-- Add the sidebar's background. This div must be placed immediately after the control sidebar -->
+  <div class="control-sidebar-bg"></div>	
+	 </div>
+<!-- ./wrapper -->
+	
+	
+	
+
+	
+	
+	<!-- Vendor JS -->
+	<script src="{% static 'src/js/vendors.min.js' %}"></script>
+	<script src="{% static 'src/js/pages/chat-popup.js' %}"></script>
+    <script src="{% static 'assets/icons/feather-icons/feather.min.js' %}"></script>	
+	
+	<!-- edulearn App -->
+	<script src="{% static 'src/js/demo.js' %}"></script>
+	<script src="{% static 'src/js/template.js' %}"></script>
+	
+	<script src="{% static 'src/js/pages/timeline.js' %}"></script>
+	
+
+	<script>
+		// Force phone number input to start with +
+const phoneInput = document.querySelector('input[name="phone"]');
+phoneInput.addEventListener('input', function() {
+  if (!this.value.startsWith('+')) {
+    this.value = '+' + this.value.replace(/^\+*/, '');
+  }
+});
+	</script>
+
+	<script>
+  // Automatically dismiss after 3 seconds (3000ms)
+  setTimeout(function () {
+    const alert = document.getElementById('autoDismiss');
+    if (alert) {
+      // Trigger fade out
+      alert.classList.remove('show');
+      // Remove from DOM after transition ends
+      alert.addEventListener('transitionend', function () {
+        alert.remove();
+      });
+    }
+  }, 3000);
+</script>
+
+	
+</body>
+</html>

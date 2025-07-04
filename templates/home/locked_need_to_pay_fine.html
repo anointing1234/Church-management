@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Access Locked - Payment Required</title>
+  <link rel="stylesheet" href="{% static 'src/css/vendors_css.css' %}">
+  <link rel="stylesheet" href="{% static 'src/css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'src/css/skin_color.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+  <style>
+    .lock-icon {
+      font-size: 120px;
+      color: #dc3545; /* red */
+      animation: shake 0.7s infinite;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+    }
+    .btn-contact {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      font-size: 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .btn-contact:hover {
+      background-color: #a71d2a;
+    }
+  </style>
+</head>
+<body class="hold-transition dark-skin sidebar-mini theme-primary fixed">
+
+  <section class="error-page h-p100">
+    <div class="container h-p100">
+      <div class="row h-p100 align-items-center justify-content-center text-center">
+        <div class="col-lg-7 col-md-10 col-12 rounded30 p-50">
+          <i class="fas fa-lock-open lock-icon"></i>
+          <h1 class="fw-600">Access Denied</h1>
+          <h3 class="text-fade">You missed last week's submission.</h3>
+          <h4 class="text-fade">Please contact admin to pay your fine before getting access.</h4>
+          <button class="btn-contact" onclick="window.location.href='mailto:admin@example.com'">Contact Admin</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</body>
+</html>

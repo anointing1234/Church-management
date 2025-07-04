@@ -1,0 +1,605 @@
+{% extends "../core/base/base.html" %}
+{% load static %}
+{% block contents %}
+
+
+<style>
+   .analysis-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .analysis-buttons .btn {
+            min-width: 120px;
+        }
+        .modal-content {
+            border-radius: 10px;
+        }
+
+
+         #new-service-form {
+            display: none;
+        }
+        #new-service-form.show {
+            display: block;
+        }
+        .card{
+          padding:10px;
+        }
+
+        @media (min-width:768px) {
+          .modal-content{
+            height: 520px;
+          }
+
+          .modal-content .modal-body .card{
+            height: 60px;
+          }
+          
+        }
+
+    
+      
+            
+</style>
+
+<div class="content-wrapper">
+  <div class="container-full">
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="row">
+
+        <!-- Heading -->
+        <div class="col-12 mb-4">
+          <p class="my-10 fs-16 text-white-70">Activity and Report Progress for This Month</p>
+          {% comment %} <div class="alert alert-light mt-3 mb-2" role="alert">
+  A simple light alert with <a href="#" class="alert-link">an example link</a>. Give it a click if you like.
+</div>  {% endcomment %}
+           <!-- Form for Adding New Records -->
+    {% if not request.user.is_superuser %}
+            <button type="button" id="toggleFormButton" class="btn {% if access_denied %} btn-danger {% else %} btn-primary mb-3 {% endif %}" {% if access_denied %}data-bs-toggle="modal" data-bs-target="#accessDeniedModal"{% else %}onclick="toggleForm()"{% endif %}>Add New Report</button>
+            {% endif %}
+        </div>
+
+
+        <!-- Reports Submitted Card -->
+        <div class="col-12 col-md-4 mb-4">
+          <div class="card bg-warning text-white h-100">
+            <div class="card-body d-flex align-items-center">
+              <div class="me-3 text-center fs-24 w-50 h-50 lh-50 bg-white text-warning rounded">
+                <i class="fa fa-file-alt"></i>
+              </div>
+              <div>
+                <h4 class="mb-0">Reports Submitted</h4>
+                <p class="mb-0">{{ records.count }} (Total Records)</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reports Completed Card -->
+        <div class="col-12 col-md-4 mb-4">
+          <div class="card bg-success text-white h-100">
+            <div class="card-body d-flex align-items-center">
+              <div class="me-3 text-center fs-24 w-50 h-50 lh-50 bg-white text-success rounded">
+                <i class="fa fa-check-circle"></i>
+              </div>
+              <div>
+                <h4 class="mb-0">Reports Completed</h4>
+                <p class="mb-0">{{ records.count }} (Showing Latest First)</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+    {% comment %} <div class="row align-items-center gy-2 mb-4">
+  <!-- Filter Dropdown -->
+  <div class="col-12 col-md-auto mb-5">
+    <form method="get" class="d-flex align-items-center">
+      <label for="filterType" class="form-label fw-bold me-2 mb-0">Filter by:</label>
+      <select id="filterType" name="filter" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
+        <option value="week" {% if filter_type == "week" %}selected{% endif %}>This Week</option>
+        <option value="month" {% if filter_type == "month" %}selected{% endif %}>This Month</option>
+        <option value="year" {% if filter_type == "year" %}selected{% endif %}>This Year</option>
+      </select>
+    </form>
+  </div> {% endcomment %}
+{% comment %} 
+
+ <div class="row text-center mb-4 mt-5 pt-5">
+    <div class="col-md-4">
+        <div class="card bg-light shadow-sm p-3 rounded">
+            <h5 class="card-title">Total Male Attendees</h5>
+            <p class="card-text fs-4 fw-bold text-primary">{{ total_male|default:0 }}</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-light shadow-sm p-3 rounded">
+            <h5 class="card-title">Total Female Attendees</h5>
+            <p class="card-text fs-4 fw-bold text-primary">{{ total_female|default:0 }}</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-light shadow-sm p-3 rounded">
+            <h5 class="card-title">Total Children Attendees</h5>
+            <p class="card-text fs-4 fw-bold text-primary">{{ total_cars|default:0 }}</p>
+        </div>
+    </div>
+</div> {% endcomment %}
+
+
+
+
+
+
+    <!-- Form for Adding New Records -->
+    {% if not request.user.is_superuser %}
+  
+    <!-- Access Denied Modal -->
+    <div class="modal fade" id="accessDeniedModal" tabindex="-1" aria-labelledby="accessDeniedModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title text-white" id="accessDeniedModalLabel">Access Denied</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-white">You have missed last week's report. Contact admin to pay fine and gain access to your account.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form for Adding New Records -->
+    <div class="col-12">
+        <div class="box">
+            <div class="box-header">
+                <h4 class="box-title">Add a New Ministry {{ category|title }} Report</h4>
+                <p class="mb-0 subtitle">Click the button below to add a new service record</p>
+            </div>
+            <div class="box-body">
+                <form method="POST" id="new-service-form" class="mt-3">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="service_day" class="form-label">Service Day</label>
+                            <select name="service_day" id="service_day" class="form-select form-select-sm" required>
+                                <option value="sunday">Sunday</option>
+                                <option value="wednesday">Wednesday</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="service" class="form-label">Service No.</label>
+                            <select name="service" id="service" class="form-select form-select-sm" required>
+                                <option value="1">1st Service</option>
+                                <option value="2">2nd Service</option>
+                                <option value="3">3rd Service</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="male" class="form-label">Male Attendees</label>
+                            <input type="number" name="male" id="male" class="form-control form-control-sm" min="0" required />
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-3">
+                        <div class="col-md-3">
+                            <label for="female" class="form-label">Female Attendees</label>
+                            <input type="number" name="female" id="female" class="form-control form-control-sm" min="0" required />
+                        </div>
+                        <div class="col-md-3">
+                            <label for="children" class="form-label">Children Attendees</label>
+                            <input type="number" name="children" id="children" class="form-control form-control-sm" min="0" required />
+                        </div>
+                        <div class="col-md-3">
+                            <label for="number_of_cars" class="form-label">Number of Cars</label>
+                            <input type="number" name="number_of_cars" id="number_of_cars" class="form-control form-control-sm" min="0" required />
+                        </div>
+                    </div>
+                    <div class="text-end mt-4">
+                        <button type="submit" class="btn btn-success">Save New</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    <!-- Analysis Buttons -->
+    <div class="col-12 mb-5">
+        <div class="box">
+            <div class="box-header">
+                <h4 class="box-title">Weekly Thursday Report Analysis for {{ category|title }} Ministry Church</h4>
+                <p class="mb-0 subtitle">Click a button to view comparison of latest and previous Thursday reports</p>
+            </div>
+            <div class="box-body">
+                <div class="analysis-buttons">
+                    {% if report_differences %}
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#analysisModal" data-field="male" data-current="{{ report_differences.0.current_male }}" data-prev="{{ report_differences.0.prev_male }}" data-diff="{{ report_differences.0.male_diff }}" data-current-date="{{ report_differences.0.date|date:'Y-m-d' }}" data-prev-date="{{ report_differences.0.prev_date|date:'Y-m-d' }}">Male</button>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#analysisModal" data-field="female" data-current="{{ report_differences.0.current_female }}" data-prev="{{ report_differences.0.prev_female }}" data-diff="{{ report_differences.0.female_diff }}" data-current-date="{{ report_differences.0.date|date:'Y-m-d' }}" data-prev-date="{{ report_differences.0.prev_date|date:'Y-m-d' }}">Female</button>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#analysisModal" data-field="children" data-current="{{ report_differences.0.current_children }}" data-prev="{{ report_differences.0.prev_children }}" data-diff="{{ report_differences.0.children_diff }}" data-current-date="{{ report_differences.0.date|date:'Y-m-d' }}" data-prev-date="{{ report_differences.0.prev_date|date:'Y-m-d' }}">Children</button>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#analysisModal" data-field="cars" data-current="{{ report_differences.0.current_cars }}" data-prev="{{ report_differences.0.prev_cars }}" data-diff="{{ report_differences.0.cars_diff }}" data-current-date="{{ report_differences.0.date|date:'Y-m-d' }}" data-prev-date="{{ report_differences.0.prev_date|date:'Y-m-d' }}">Cars</button>
+                    {% else %}
+                    <p class="text-center text-muted">No data available for analysis (ensure at least two reports exist)</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analysis Modal -->
+    <div class="modal fade" id="analysisModal" tabindex="-1" aria-labelledby="analysisModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="analysisModalLabel">Analysis for <span id="modalField"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="card">
+                        <h6>Current Date (Thursday)</h6>
+                        <p id="modalCurrentDate"></p>
+                    </div>
+                    <div class="card">
+                        <h6>Previous Date (Thursday)</h6>
+                        <p id="modalPrevDate"></p>
+                    </div>
+                    <div class="card">
+                        <h6>Current Report Total</h6>
+                        <p id="modalCurrent"></p>
+                    </div>
+                    <div class="card">
+                        <h6>Previous Report Total</h6>
+                        <p id="modalPrev"></p>
+                    </div>
+                    <div class="card">
+                        <h6>Analysis</h6>
+                        <p id="modalDiff"></p>
+                    </div>
+                     <div class="container-fluid d-flex justify-content-center p-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                     </div>
+                </div>
+             
+            </div>
+        </div>
+    </div>
+
+
+  {% if not request.user.is_superuser %}
+  <!-- Toggle Edit Mode Button -->
+  <div class="col-12 col-md-auto text-md-end mb-5">
+    <button class="btn btn-primary" type="button" onclick="toggleEditTable()">Edit details</button>
+  </div>
+</div>
+{%  endif %}
+
+
+
+<!-- View More Link -->
+
+
+
+
+
+
+
+
+
+
+<!-- Records Table (Read-only) -->
+<div class="col-12" id="view-mode-table">
+  <div class="box">
+    <div class="box-header">
+      <h4 class="box-title">Records for Ministry {{ category|default:"Ministry" }} Activities</h4>
+      <p class="mb-0 subtitle">You can only view service entries below</p>
+    </div>
+    <div class="box-body table-responsive">
+      <table id="recordsTable" class="table table-bordered table-striped text-fade">
+        <thead>
+          <tr class="text-dark">
+            <th>Date</th>
+            <th>Service Day</th>
+            <th>Service No.</th>
+            <th>Male Attendees</th>
+            <th>Female Attendees</th>
+            <th>Children Attendees</th>
+            <th>Total Attendance</th>
+            <th>Number of Cars</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in records %}
+          <tr>
+            <td>{{ s.date|date:"Y-m-d" }}</td>
+            <td>{{ s.get_sunday_wednesday_display }}</td>
+            <td>{{ s.get_service_display }}</td>
+            <td>{{ s.male }}</td>
+            <td>{{ s.female }}</td>
+            <td>{{ s.children }}</td>
+            <td>{{ s.total }}</td>
+            <td>{{ s.number_of_cars }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="8" class="text-center text-muted">No service records yet.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+  {% if total_count > records|length and view_mode != 'all' %}
+  <div class="col-6 col-md text-md-start mt-2 mb-3">
+    <a href="?filter={{ filter_type }}&view=all" class="btn btn-link">
+      View more ({{ total_count|add:"-records|length" }} older)
+    </a>
+  </div>
+  {% endif %}
+
+<!-- Add New Ministry Service Form (only for non-superusers) -->
+{% if not request.user.is_superuser %}
+
+
+<!-- Edit Records Form (hidden by default) -->
+<form method="POST" action="{% url 'update_ministry_records' category=category %}" id="edit-form" style="display:none;">
+  {% csrf_token %}
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Service Day</th>
+          <th>Service No.</th>
+          <th>Male Attendees</th>
+          <th>Female Attendees</th>
+          <th>Children Attendees</th>
+          <th>Number of Cars</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for record in records %}
+        <tr>
+          <td><input type="date" value="{{ record.date|date:'Y-m-d' }}" class="form-control" readonly></td>
+          <td>
+            <select name="service_day_{{ record.id }}" class="form-select form-select-sm">
+              <option value="sunday_wednesday" {% if record.sunday_wednesday == 'sunday_wednesday' %}selected{% endif %}>Sunday & Wednesday</option>
+              <option value="sunday" {% if record.sunday_wednesday == 'sunday' %}selected{% endif %}>Sunday</option>
+              <option value="wednesday" {% if record.sunday_wednesday == 'wednesday' %}selected{% endif %}>Wednesday</option>
+            </select>
+          </td>
+          <td>
+            <select name="service_{{ record.id }}" class="form-select form-select-sm">
+              <option value="1" {% if record.service == '1' %}selected{% endif %}>1st Service</option>
+              <option value="2" {% if record.service == '2' %}selected{% endif %}>2nd Service</option>
+              <option value="3" {% if record.service == '3' %}selected{% endif %}>3rd Service</option>
+            </select>
+          </td>
+          <td><input type="number" name="male_{{ record.id }}" value="{{ record.male }}" class="form-control form-control-sm" min="0"></td>
+          <td><input type="number" name="female_{{ record.id }}" value="{{ record.female }}" class="form-control form-control-sm" min="0"></td>
+          <td><input type="number" name="children_{{ record.id }}" value="{{ record.children }}" class="form-control form-control-sm" min="0"></td>
+          <td><input type="number" name="cars_{{ record.id }}" value="{{ record.number_of_cars }}" class="form-control form-control-sm" min="0"></td>
+          <input type="hidden" name="update_ids" value="{{ record.id }}">
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="text-center">No records found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="text-end mt-3 mb-3">
+    <button type="submit" class="btn btn-success">Update Selected</button>
+  </div>
+</form>
+{% endif %}
+
+
+  
+
+
+
+
+
+
+      </div>
+    </section>
+    <!-- /.content -->
+  </div>
+</div>
+
+<!-- Footer -->
+  <footer class="main-footer">
+    <div class="pull-right d-none d-sm-inline-block">
+        <ul class="nav nav-primary nav-dotted nav-dot-separated justify-content-center justify-content-md-end">
+
+		</ul>
+    </div>
+	  &copy; <script>document.write(new Date().getFullYear())</script> <a href="https://www.MiracleAssemblyManagement.com/">MiracleAssemblyManagement.com</a>. All Rights Reserved.
+  </footer>
+<!-- Overlay Spinner -->
+<div id="loading-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">
+  <div class="spinner" style="border:8px solid rgba(255,255,255,0.2); border-top:8px solid #FFD700; border-radius:50%; width:80px; height:80px; animation:spin 1s linear infinite;"></div>
+</div>
+<style>
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+
+<!-- Toastify CSS & JS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+<script>
+(function(){
+  const form = document.getElementById('new-service-form');
+  const overlay = document.getElementById('loading-overlay');
+  const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+  form.addEventListener('submit', async function(e) {
+    // Prevent default form submission
+    e.preventDefault();
+
+    // Validate children field
+    const childrenInput = document.getElementById('children');
+    if (childrenInput.value < 0) {
+      Toastify({
+        text: 'Please enter a valid number of children.',
+        duration: 4000,
+        gravity: 'top',
+        position: 'right',
+        backgroundColor: '#dc3545',
+      }).showToast();
+      childrenInput.focus();
+      return; // Stop submission
+    }
+
+    overlay.style.display = 'flex';
+
+    // Please wait… toast
+    const waitToast = Toastify({
+      text: 'Please wait…',
+      duration: -5,   // infinite until hideToast()
+      gravity: 'top',
+      position: 'right',
+      backgroundColor: 'linear-gradient(to right,#D4AF37,#AE7D54)',
+      stopOnFocus: true
+    }).showToast();
+
+    const formData = new FormData(form);
+    try {
+      const response = await fetch(window.location.href, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': csrftoken },
+        body: formData,
+      });
+      const result = await response.json();
+      
+      overlay.style.display = 'none';
+      waitToast.hideToast();
+
+      if (result.status === 'success') {
+        Toastify({
+          text: result.message,
+          duration: 3000,
+          gravity: 'top',
+          position: 'right',
+          backgroundColor: '#28a745',
+        }).showToast();
+
+        // Optionally: reset form inputs to defaults
+        form.reset();
+
+        // Optionally: reload the page or append the new row to the first table
+        setTimeout(() => window.location.reload(), 1000);
+      } else {
+        Toastify({
+          text: result.message || 'Failed to save.',
+          duration: 4000,
+          gravity: 'top',
+          position: 'right',
+          backgroundColor: '#dc3545',
+        }).showToast();
+      }
+    } catch (err) {
+      overlay.style.display = 'none';
+      waitToast.hideToast();
+      Toastify({
+        text: 'An unexpected error occurred.',
+        duration: 4000,
+        gravity: 'top',
+        position: 'right',
+        backgroundColor: '#dc3545',
+      }).showToast();
+    }
+  });
+})();
+</script>
+
+<script>
+  function toggleEditTable() {
+    const editForm = document.getElementById('edit-form');
+    const viewTable = document.getElementById('view-mode-table');
+    if (editForm.style.display === 'none') {
+      editForm.style.display = 'block';
+      viewTable.style.display = 'none';
+    } else {
+      editForm.style.display = 'none';
+      viewTable.style.display = 'block';
+    }
+  }
+</script>
+
+
+
+
+
+    <script>
+          function toggleForm() {
+            const form = document.getElementById('new-service-form');
+            form.classList.toggle('show');
+        }
+
+        // Modal data population
+        document.querySelectorAll('[data-bs-toggle="modal"]').forEach(button => {
+            button.addEventListener('click', function() {
+                const field = this.getAttribute('data-field');
+                const current = this.getAttribute('data-current');
+                const prev = this.getAttribute('data-prev');
+                const diff = this.getAttribute('data-diff');
+                const currentDate = this.getAttribute('data-current-date');
+                const prevDate = this.getAttribute('data-prev-date');
+
+                document.getElementById('modalField').textContent = field.charAt(0).toUpperCase() + field.slice(1).replace(/_/g, ' ');
+                document.getElementById('modalCurrentDate').textContent = currentDate;
+                document.getElementById('modalPrevDate').textContent = prevDate;
+                document.getElementById('modalCurrent').textContent = current;
+                document.getElementById('modalPrev').textContent = prev;
+                document.getElementById('modalDiff').textContent = diff;
+            });
+        });
+    </script>
+
+
+
+
+    
+    <script>
+       
+        document.querySelectorAll('[data-bs-toggle="modal"]').forEach(button => {
+            button.addEventListener('click', function() {
+                const field = this.getAttribute('data-field');
+                const current = this.getAttribute('data-current');
+                const prev = this.getAttribute('data-prev');
+                const diff = this.getAttribute('data-diff');
+                const currentDate = this.getAttribute('data-current-date');
+                const prevDate = this.getAttribute('data-prev-date');
+
+                document.getElementById('modalField').textContent = field.charAt(0).toUpperCase() + field.slice(1).replace(/_/g, ' ');
+                document.getElementById('modalCurrentDate').textContent = currentDate;
+                document.getElementById('modalPrevDate').textContent = prevDate;
+                document.getElementById('modalCurrent').textContent = current;
+                document.getElementById('modalPrev').textContent = prev;
+                document.getElementById('modalDiff').textContent = diff;
+            });
+        });
+    </script>
+
+{% endblock contents %}

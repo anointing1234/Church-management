@@ -1,0 +1,447 @@
+{% extends "../core/base/base.html" %}
+{% load static %}
+{% block contents %}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+  <div class="container-full">
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="row">
+
+        <!-- Heading -->
+        <div class="col-12 mb-4">
+          <p class="my-10 fs-16 text-white-70">Activity and report progress for this month.</p>
+        </div>
+
+        <!-- Submitted Reports Card -->
+        <div class="col-12 col-md-4 mb-4">
+          <div class="card bg-warning text-white h-100">
+            <div class="card-body d-flex align-items-center">
+              <div class="me-3 text-center fs-24 w-50 h-50 lh-50 bg-white text-warning rounded">
+                <i class="fa fa-file-alt" aria-hidden="true"></i>
+              </div>
+              <div>
+                <h4 class="mb-0">Reports Submitted</h4>
+                <p class="mb-0">{{ records.count }} (Total Records)</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Completed Reports Card -->
+        <div class="col-12 col-md-4 mb-4">
+          <div class="card bg-success text-white h-100">
+            <div class="card-body d-flex align-items-center">
+              <div class="me-3 text-center fs-24 w-50 h-50 lh-50 bg-white text-success rounded">
+                <i class="fa fa-check-circle" aria-hidden="true"></i>
+              </div>
+              <div>
+                <h4 class="mb-0">Reports Completed</h4>
+                <p class="mb-0">
+                  {{ records|dictsortreversed:"date"|slice:":records.count"|length }}
+                  (Showing latest first)
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+         <div class="row align-items-center gy-2 mb-4">
+  <!-- Filter Dropdown -->
+  <div class="col-12 col-md-auto">
+    <form method="get" class="d-flex align-items-center">
+      <label for="filterType" class="form-label fw-bold me-2 mb-0">Filter by:</label>
+      <select id="filterType" name="filter" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
+        <option value="week" {% if filter_type == "week" %}selected{% endif %}>This Week</option>
+        <option value="month" {% if filter_type == "month" %}selected{% endif %}>This Month</option>
+        <option value="year" {% if filter_type == "year" %}selected{% endif %}>This Year</option>
+      </select>
+    </form>
+  </div>
+
+  <!-- View More Link -->
+  {% if total_count > records|length and view_mode != 'all' %}
+  <div class="col-12 col-md text-md-end">
+    <a href="?filter={{ filter_type }}&view=all" class="btn btn-link">
+      View more ({{ total_count|add:"-records|length" }} older)
+    </a>
+  </div>
+  {% endif %}
+
+ 
+ <!-- 1️⃣ Editable DataTable: showing your HillChurch records -->
+<div class="col-12">
+  <div class="box">
+    <div class="box-header">
+      <h4 class="box-title">Records for missions team summary</h4>
+      <p class="mb-0 subtitle">You can only view service entries below</p>
+    </div>
+    <div class="box-body">
+      <div class="table-responsive">
+        <table id="example1" class="text-fade table table-bordered" role="grid">
+          <thead>
+            <tr class="text-dark">
+              <th>Date</th>
+              <th>Evbuotubu Total</th>
+              <th>GRA Total</th>
+              <th>Grand Total</th>
+              
+{% if not request.user.is_superuser %}
+              <th>Edit</th>
+              {% endif %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for summary in records %}
+            <tr>
+              <td>{{ summary.date }}</td>
+              <td>{{ summary.evbuotubu }}</td>
+              <td>{{ summary.gra }}</td>
+              <td>{{ summary.grand_total }}</td>
+              
+            {% if not request.user.is_superuser %}
+              <td>
+                <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editModal{{ summary.id }}">Edit</button>
+              </td>
+              {% endif %}
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5" class="text-center text-muted">No records yet.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+{% if not request.user.is_superuser %}
+      <!-- Modal(s) go here, OUTSIDE the tbody, but inside the for loop -->
+      {% for summary in records %}
+      <div class="modal fade" id="editModal{{ summary.id }}" tabindex="-1" aria-labelledby="editModalLabel{{ summary.id }}" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <form method="POST" action="{% url 'mission-edit-inline' summary.id %}">
+              {% csrf_token %}
+              <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel{{ summary.id }}">Edit Mission Summary ({{ summary.date }})</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+
+              <div class="modal-body row g-3">
+                <!-- Evbuotubu Section -->
+                <h6 class="text-primary">Evbuotubu</h6>
+                <div class="col-md-4">
+                  <label>Total First Time Guests</label>
+                  <input type="number" name="total_first_time_guests_evbuotubu" value="{{ summary.total_first_time_guests_evbuotubu }}" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                  <label>Reached First Time Guests</label>
+                  <input type="number" name="reached_first_time_guests_evbuotubu" value="{{ summary.reached_first_time_guests_evbuotubu }}" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                  <label>Not Reachable First Time Guests</label>
+                  <input type="number" name="not_reachable_first_time_guests_evbuotubu" value="{{ summary.not_reachable_first_time_guests_evbuotubu }}" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                  <label>Visitors & Outsiders</label>
+                  <input type="number" name="visitors_and_outsiders_evbuotubu" value="{{ summary.visitors_and_outsiders_evbuotubu }}" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                  <label>Committed to 2nd Visit</label>
+                  <input type="number" name="committed_to_second_visit_evbuotubu" value="{{ summary.committed_to_second_visit_evbuotubu }}" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                  <label>Believers Academy</label>
+                  <input type="number" name="committed_to_believers_academy_evbuotubu" value="{{ summary.committed_to_believers_academy_evbuotubu }}" class="form-control" required>
+                </div>
+
+                <!-- GRA Section -->
+                <h6 class="text-primary mt-3">GRA</h6>
+                <div class="col-md-4">
+                  <label>Total First Time Guests</label>
+                  <input type="number" name="total_first_time_guests_gra" value="{{ summary.total_first_time_guests_gra }}" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                  <label>Reached First Time Guests</label>
+                  <input type="number" name="reached_first_time_guests_gra" value="{{ summary.reached_first_time_guests_gra }}" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                  <label>Not Reachable First Time Guests</label>
+                  <input type="number" name="not_reachable_first_time_guests_gra" value="{{ summary.not_reachable_first_time_guests_gra }}" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                  <label>Visitors & Outsiders</label>
+                  <input type="number" name="visitors_and_outsiders_gra" value="{{ summary.visitors_and_outsiders_gra }}" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                  <label>Committed to 2nd Visit</label>
+                  <input type="number" name="committed_to_second_visit_gra" value="{{ summary.committed_to_second_visit_gra }}" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                  <label>Believers Academy</label>
+                  <input type="number" name="committed_to_believers_academy_gra" value="{{ summary.committed_to_believers_academy_gra }}" class="form-control" required>
+                </div>
+              </div>
+
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+
+{% if not request.user.is_superuser %}
+<div class="col-12">
+  <div class="box">
+    <div class="box-header">
+      <h4 class="box-title">Add a new missions team summary</h4>
+      <p class="mb-0 subtitle">Fill in the details below and click “Save New” to record a service</p>
+    </div>
+    <div class="box-body">
+      
+  <!-- Mission Team Summary Form -->
+  <form method="POST" id="new-service-form" class="row g-3">
+    {% csrf_token %}
+
+    <!-- Evbuotubu and GRA totals (readonly, calculated) -->
+    <div class="col-md-6">
+      <label class="form-label">Evbuotubu</label>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">GRA</label>
+    </div>
+
+    <!-- Total First Time Guests -->
+    <div class="col-md-6">
+      <label for="id_total_first_time_guests_evbuotubu" class="form-label">Total First Time Guests (Evbuotubu)</label>
+      <input type="number" min="0" class="form-control" id="id_total_first_time_guests_evbuotubu" name="total_first_time_guests_evbuotubu" required>
+    </div>
+    <div class="col-md-6">
+      <label for="id_total_first_time_guests_gra" class="form-label">Total First Time Guests (GRA)</label>
+      <input type="number" min="0" class="form-control" id="id_total_first_time_guests_gra" name="total_first_time_guests_gra" required>
+    </div>
+
+    <!-- Reached First Time Guests -->
+    <div class="col-md-6">
+      <label for="id_reached_first_time_guests_evbuotubu" class="form-label">Reached First Time Guests (Evbuotubu)</label>
+      <input type="number" min="0" class="form-control" id="id_reached_first_time_guests_evbuotubu" name="reached_first_time_guests_evbuotubu" required>
+    </div>
+    <div class="col-md-6">
+      <label for="id_reached_first_time_guests_gra" class="form-label">Reached First Time Guests (GRA)</label>
+      <input type="number" min="0" class="form-control" id="id_reached_first_time_guests_gra" name="reached_first_time_guests_gra" required>
+    </div>
+
+    <!-- Not Reachable First Time Guests -->
+    <div class="col-md-6">
+      <label for="id_not_reachable_first_time_guests_evbuotubu" class="form-label">Not Reachable First Time Guests (Evbuotubu)</label>
+      <input type="number" min="0" class="form-control" id="id_not_reachable_first_time_guests_evbuotubu" name="not_reachable_first_time_guests_evbuotubu" required>
+    </div>
+    <div class="col-md-6">
+      <label for="id_not_reachable_first_time_guests_gra" class="form-label">Not Reachable First Time Guests (GRA)</label>
+      <input type="number" min="0" class="form-control" id="id_not_reachable_first_time_guests_gra" name="not_reachable_first_time_guests_gra" required>
+    </div>
+
+    <!-- Visitors and Outsiders -->
+    <div class="col-md-6">
+      <label for="id_visitors_and_outsiders_evbuotubu" class="form-label">Visitors and Outsiders (Evbuotubu)</label>
+      <input type="number" min="0" class="form-control" id="id_visitors_and_outsiders_evbuotubu" name="visitors_and_outsiders_evbuotubu" required>
+    </div>
+    <div class="col-md-6">
+      <label for="id_visitors_and_outsiders_gra" class="form-label">Visitors and Outsiders (GRA)</label>
+      <input type="number" min="0" class="form-control" id="id_visitors_and_outsiders_gra" name="visitors_and_outsiders_gra" required>
+    </div>
+
+    <!-- Committed to Second Visit -->
+    <div class="col-md-6">
+      <label for="id_committed_to_second_visit_evbuotubu" class="form-label">Committed to Second Visit (Evbuotubu)</label>
+      <input type="number" min="0" class="form-control" id="id_committed_to_second_visit_evbuotubu" name="committed_to_second_visit_evbuotubu" required>
+    </div>
+    <div class="col-md-6">
+      <label for="id_committed_to_second_visit_gra" class="form-label">Committed to Second Visit (GRA)</label>
+      <input type="number" min="0" class="form-control" id="id_committed_to_second_visit_gra" name="committed_to_second_visit_gra"required>
+    </div>
+
+    <!-- Committed to Believers Academy -->
+    <div class="col-md-6">
+      <label for="id_committed_to_believers_academy_evbuotubu" class="form-label">Committed to Believers Academy (Evbuotubu)</label>
+      <input type="number" min="0" class="form-control" id="id_committed_to_believers_academy_evbuotubu" name="committed_to_believers_academy_evbuotubu" required>
+    </div>
+    <div class="col-md-6">
+      <label for="id_committed_to_believers_academy_gra" class="form-label">Committed to Believers Academy (GRA)</label>
+      <input type="number" min="0" class="form-control" id="id_committed_to_believers_academy_gra" name="committed_to_believers_academy_gra" required>
+    </div>
+
+    <!-- Attended Cell Meeting Same Day -->
+    <div class="col-md-6">
+      <label for="id_attended_cell_meeting_same_day_evbuotubu" class="form-label">Attended Cell Meeting Same Day (Evbuotubu)</label>
+      <input type="number" min="0" class="form-control" id="id_attended_cell_meeting_same_day_evbuotubu" name="attended_cell_meeting_same_day_evbuotubu" required>
+    </div>
+    <div class="col-md-6">
+      <label for="id_attended_cell_meeting_same_day_gra" class="form-label">Attended Cell Meeting Same Day (GRA)</label>
+      <input type="number" min="0" class="form-control" id="id_attended_cell_meeting_same_day_gra" name="attended_cell_meeting_same_day_gra" required>
+    </div>
+
+    <!-- Committed to Cell Meeting Next Week -->
+    <div class="col-md-6">
+      <label for="id_committed_to_cell_meeting_next_week_evbuotubu" class="form-label">Committed to Cell Meeting Next Week (Evbuotubu)</label>
+      <input type="number" min="0" class="form-control" id="id_committed_to_cell_meeting_next_week_evbuotubu" name="committed_to_cell_meeting_next_week_evbuotubu" required>
+    </div>
+    <div class="col-md-6">
+      <label for="id_committed_to_cell_meeting_next_week_gra" class="form-label">Committed to Cell Meeting Next Week (GRA)</label>
+      <input type="number" min="0" class="form-control" id="id_committed_to_cell_meeting_next_week_gra" name="committed_to_cell_meeting_next_week_gra" required>
+    </div>
+
+    <!-- Second Time Visitors Previous Week -->
+    <div class="col-md-6">
+      <label for="id_second_time_visitors_previous_week_evbuotubu" class="form-label">Second Time Visitors Previous Week (Evbuotubu)</label>
+      <input type="number" min="0" class="form-control" id="id_second_time_visitors_previous_week_evbuotubu" name="second_time_visitors_previous_week_evbuotubu" required>
+    </div>
+    <div class="col-md-6">
+      <label for="id_second_time_visitors_previous_week_gra" class="form-label">Second Time Visitors Previous Week (GRA)</label>
+      <input type="number" min="0" class="form-control" id="id_second_time_visitors_previous_week_gra" name="second_time_visitors_previous_week_gra" required>
+    </div>
+
+   
+
+    <!-- Submit -->
+    <div class="col-12 mt-4">
+      <button type="submit" class="btn btn-primary">Save Summary</button>
+    </div>
+  </form>
+    </div>
+  </div>
+</div>
+
+{% endif %}
+
+      </div>
+    </section>
+    <!-- /.content -->
+
+  </div>
+</div>
+<!-- /.content-wrapper -->
+</div>
+
+<!-- Footer -->
+  <footer class="main-footer">
+    <div class="pull-right d-none d-sm-inline-block">
+        <ul class="nav nav-primary nav-dotted nav-dot-separated justify-content-center justify-content-md-end">
+
+		</ul>
+    </div>
+	  &copy; <script>document.write(new Date().getFullYear())</script> <a href="https://www.MiracleAssemblyManagement.com/">MiracleAssemblyManagement.com</a>. All Rights Reserved.
+  </footer>
+
+<!-- Overlay Spinner -->
+<div id="loading-overlay" style="display:none; position:fixed; top:0; left:0;
+     width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999;
+     align-items:center; justify-content:center;">
+  <div class="spinner"
+       style="border:8px solid rgba(255,255,255,0.2);
+              border-top:8px solid #FFD700;
+              border-radius:50%;
+              width:80px; height:80px;
+              animation:spin 1s linear infinite;"></div>
+</div>
+<style>
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+
+<!-- Toastify CSS & JS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+<script>
+(function(){
+  const form = document.getElementById('new-service-form');
+  const overlay = document.getElementById('loading-overlay');
+  const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    overlay.style.display = 'flex';
+
+    const waitToast = Toastify({
+      text: 'Please wait…',
+      duration: -1,   // infinite until hideToast()
+      gravity: 'top',
+      position: 'right',
+      backgroundColor: 'linear-gradient(to right,#D4AF37,#AE7D54)',
+      stopOnFocus: true
+    }).showToast();
+
+    const formData = new FormData(form);
+
+    try {
+      const response = await fetch(window.location.href, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': csrftoken },
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      overlay.style.display = 'none';
+      waitToast.hideToast();
+
+      if (result.status === 'success') {
+        Toastify({
+          text: result.message || 'Summary saved successfully!',
+          duration: 2000, // shorter success message
+          gravity: 'top',
+          position: 'right',
+          backgroundColor: '#28a745',
+          onClick: function() {
+            // Allow manual reload on click too
+            location.reload();
+          }
+        }).showToast();
+
+        // Reload the page right after toast disappears
+        setTimeout(() => {
+          location.reload();
+        }, 2000);
+
+      } else {
+        Toastify({
+          text: result.message || 'An error occurred. Please try again.',
+          duration: 4000,
+          gravity: 'top',
+          position: 'right',
+          backgroundColor: '#dc3545',
+        }).showToast();
+      }
+
+    } catch (error) {
+      overlay.style.display = 'none';
+      waitToast.hideToast();
+
+      Toastify({
+        text: 'Network error. Please check your connection and try again.',
+        duration: 4000,
+        gravity: 'top',
+        position: 'right',
+        backgroundColor: '#dc3545',
+      }).showToast();
+
+      console.error('Fetch error:', error);
+    }
+  });
+})();
+</script>
+
+
+
+{% endblock contents %}

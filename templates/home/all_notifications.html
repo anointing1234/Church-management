@@ -1,0 +1,19 @@
+{% extends "../core/base/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Users Missing Weekly Report</h2>
+    {% if missing_report_users %}
+        <ul class="list-group">
+            {% for user in missing_report_users %}
+                <li class="list-group-item">
+                    <strong>{{ user.username }}</strong> has not submitted a report in the past week.
+                    <!-- You can add links or extra info here -->
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-white">No users missing reports this week.</p>
+    {% endif %}
+</div>
+{% endblock %}

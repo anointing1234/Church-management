@@ -1,0 +1,80 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="{% static 'images/favicon.ico' %}">
+    <title>MIRACLE ASSEMBLY - MANAGEMENT SYSTEM</title>
+
+    <!-- Vendors Style-->
+    <link rel="stylesheet" href="{% static 'src/css/vendors_css.css' %}">
+
+    <!-- Style-->
+    <link rel="stylesheet" href="{% static 'src/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'src/css/skin_color.css' %}">
+    
+    <link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+/>
+
+
+  </head>
+ 
+    <style>
+      .active{
+        background-color:#3b4477;
+      }
+    </style>
+ 
+
+
+<body class="hold-transition dark-skin sidebar-mini theme-primary fixed">
+	
+<div class="wrapper">
+
+
+
+
+
+        {% include "../sections/navbar.html" %}
+        {% block contents %}{% endblock contents %}
+   
+
+
+
+  
+  <!-- Add the sidebar's background. This div must be placed immediately after the control sidebar -->
+  <div class="control-sidebar-bg"></div>	
+	
+</div>
+<!-- ./wrapper -->
+	
+		
+
+	<!-- Vendor JS -->
+	<script src="{% static 'src/js/vendors.min.js' %}"></script>
+	<script src="{% static 'src/js/pages/chat-popup.js' %}"></script>
+    <script src="{% static 'assets/icons/feather-icons/feather.min.js' %}"></script>
+	    <script src="{% static 'assets/vendor_components/tiny-editable/mindmup-editabletable.js' %}"></script>
+    <script src="{% static 'assets/vendor_components/tiny-editable/numeric-input-example.js' %}"></script>
+	<script src="{% static 'assets/vendor_components/apexcharts-bundle/dist/apexcharts.js' %}"></script>
+	<script src="{% static 'assets/vendor_components/moment/min/moment.min.js' %}"></script>
+	<script src="{% static 'assets/vendor_components/bootstrap-daterangepicker/daterangepicker.js' %}"></script>	
+
+
+	<!-- edulearn App -->
+	<script src="{% static 'src/js/demo.js' %}"></script>
+	<script src="{% static 'src/js/template.js' %}"></script>
+	<script src="{% static 'src/js/pages/dashboard.js' %}"></script>
+
+
+
+
+
+
+
+</body>
+</html>

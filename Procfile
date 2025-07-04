@@ -1,0 +1,1 @@
+web: gunicorn church_management.wsgi --log-file -

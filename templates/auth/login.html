@@ -1,0 +1,177 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="{% static 'images/favicon.ico' %}">
+
+      <title>MANAGEMENT SYSTEM - Login</title>
+  
+	<!-- Vendors Style-->
+	<link rel="stylesheet" href="{% static 'src/css/vendors_css.css' %}">
+	  
+	<!-- Style-->  
+	<link rel="stylesheet" href="{% static 'src/css/style.css' %}">
+	<link rel="stylesheet" href="{% static 'src/css/skin_color.css' %}">	
+
+</head>
+	
+<body class="hold-transition dark-skin theme-primary bg-img" style="background-image: url({% static 'images/auth-bg/bg-16.jpg' %})" data-overlay="5">
+	
+	<div class="container h-p100">
+		<div class="row align-items-center justify-content-md-center h-p100">	
+			
+			<div class="col-12">
+				<div class="row justify-content-center g-0">
+					<div class="col-lg-5 col-md-5 col-12">
+						<div class="bg-gray-800 rounded10 shadow-lg">
+							<div class="content-top-agile p-20 pb-0">
+								<h2 class="text-primary fw-600">SIGN IN</h2>						
+							</div>
+							<div class="p-40">
+							<form id="login_form" action="{% url 'login_view' %}" method="post">
+							{% csrf_token %}
+							<div class="form-group">
+								<div class="input-group mb-3">
+								<span class="input-group-text"><i class="text-fade ti-email"></i></span>
+								<input type="email" name="email" id="email" class="form-control ps-15" placeholder="Email" required>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="input-group mb-3">
+								<span class="input-group-text"><i class="text-fade ti-lock"></i></span>
+								<input type="password" name="password" id="password" class="form-control ps-15" placeholder="Password" required>
+								</div>
+							</div>
+							<!-- rest of your form fields -->
+							<div class="row">
+								<div class="col-6">
+								<div class="checkbox">
+									<input type="checkbox" id="basic_checkbox_1" >
+									<label for="basic_checkbox_1">Remember Me</label>
+								</div>
+								</div>
+								<div class="col-6">
+								<div class="fog-pwd text-end">
+									<a href="{% url 'send_reset_code' %}" class="text-primary fw-500 hover-primary"><i class="ion ion-locked"></i> Forgot password?</a><br>
+								</div>
+								</div>
+								<div class="col-12 text-center">
+								<button type="submit" class="btn btn-primary w-p100 mt-10">SIGN IN</button>
+								</div>
+							</div>
+							</form>
+
+								<div class="text-center">
+									<p class="mt-15 mb-0 text-fade">Don't have an account? <a href="{% url 'auth_register' %}" class="text-primary ms-5">Sign Up</a></p>
+								</div>
+								
+								
+							</div>						
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<!-- Vendor JS -->
+	<script src="{% static 'src/js/vendors.min.js' %}"></script>
+	<script src="{% static 'src/js/pages/chat-popup.js' %}"></script>
+    <script src="{% static 'assets/icons/feather-icons/feather.min.js' %}"></script>
+	
+	
+	<!-- Overlay Spinner -->
+<div id="loading-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center;">
+  <div class="spinner" style="border: 8px solid rgba(255,255,255,0.2); border-top: 8px solid #FFD700; border-radius: 50%; width: 80px; height: 80px; animation: spin 1s linear infinite;"></div>
+</div>
+
+<style>
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+</style>
+
+<!-- Toastify -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+<script>
+(function() {
+  const form = document.getElementById('login_form');
+  const overlay = document.getElementById('loading-overlay');
+  const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    overlay.style.display = 'flex';
+
+    const formData = new FormData(form);
+
+    Toastify({
+      text: 'Please wait...',
+      duration: 3000,
+      gravity: "top",
+      position: "right",
+      backgroundColor: "linear-gradient(to right, #D4AF37, #AE7D54)",
+      stopOnFocus: true
+    }).showToast();
+
+    try {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': csrftoken
+        },
+        body: formData
+      });
+
+      const result = await response.json();
+      overlay.style.display = 'none';
+
+      if (result.status === 'success') {
+        Toastify({
+          text: result.message || "Login successful!",
+          duration: 3000,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "#28a745",
+          stopOnFocus: true
+        }).showToast();
+
+        setTimeout(() => {
+          window.location.href = "{% url 'home' %}"; // Redirect after login, change to your dashboard/home URL
+        }, 2000);
+      } else {
+        Toastify({
+          text: result.message || "Login failed. Please try again.",
+          duration: 4000,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "#dc3545",
+          stopOnFocus: true
+        }).showToast();
+      }
+    } catch (error) {
+      overlay.style.display = 'none';
+      Toastify({
+        text: "An unexpected error occurred.",
+        duration: 4000,
+        gravity: "top",
+        position: "right",
+        backgroundColor: "#dc3545",
+        stopOnFocus: true
+      }).showToast();
+    }
+  });
+})();
+</script>
+
+
+</body>
+</html>
