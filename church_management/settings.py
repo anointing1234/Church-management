@@ -31,7 +31,7 @@ SECRET_KEY = 'django-insecure-x*t@866olky#bvl(i^%$p1d1mlvtt_t!#l!ih=e*&wp$tpq6&j
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["miracleassembly.top"]
 CSRF_TRUSTED_ORIGINS = ["http://miracleassembly.top"]
